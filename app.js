@@ -9,16 +9,19 @@ let minutes = 25;
 let intervalId = null;
 let isClicked = 0;
 
+//Função para remover classe ativa
 function removeActive() {
   document.querySelector(".active").classList.remove("active");
 }
 
+//Função para construir o novo conteúdo
 function contentPattern(content, src, min) {
   title.innerHTML = content;
   image.src = src;
   minutes = min;
 }
 
+//Função para alterar o conteúdo de acordo com o dataset do html
 function changeContent() {
   switch (html.dataset.contexto) {
     case "foco":
@@ -47,16 +50,19 @@ function changeContent() {
   }
 }
 
+//Função para mudar o dataset do html
 function changeContext(newContext) {
   html.dataset.contexto = newContext;
   changeContent(newContext);
 }
 
+//Função para mudar o conteúdo do botão
 function changeTimerButton(element, src, text) {
   element[0].src = src;
   element[1].textContent = text;
 }
 
+//Função para controlar o comportamento do timer
 function countDown() {
   if (minutes <= 0) {
     return;
@@ -66,6 +72,7 @@ function countDown() {
   console.log(minutes);
 }
 
+//Função que ativa o timer
 function start() {
   intervalId = setTimeout(countDown, 1000);
 }
