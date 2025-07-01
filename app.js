@@ -4,8 +4,10 @@ const image = document.querySelector(".app__image");
 const audio = new Audio("./sons/luna-rise-part-one.mp3");
 const audioPlay = new Audio("./sons/play.wav");
 const audioStop = new Audio("./sons/pause.mp3");
+const audioAlerta = new Audio("./sons/beep.mp3");
+const timerScreen = document.getElementById("timer");
 
-let minutes = 25;
+let timeInSeconds = 1500;
 let intervalId = null;
 let isClicked = 0;
 
@@ -18,7 +20,8 @@ function removeActive() {
 function contentPattern(content, src, min) {
   title.innerHTML = content;
   image.src = src;
-  minutes = min;
+  timeInSeconds = min;
+  showTime();
 }
 
 //Função para alterar o conteúdo de acordo com o dataset do html
@@ -28,21 +31,21 @@ function changeContent() {
       contentPattern(
         "Otimize sua produtividade,<br /><strong class='app__title-strong'>mergulhe no que importa.</strong>",
         "./imagens/foco.png",
-        25
+        1500
       );
       break;
     case "descanso-curto":
       contentPattern(
         "Que tal dar uma respirada?<br /><strong class='app__title-strong'>Faça uma pausa curta!</strong>",
         "./imagens/descanso-curto.png",
-        5
+        300
       );
       break;
     case "descanso-longo":
       contentPattern(
         "Hora de voltar à superfície.<br /><strong class='app__title-strong'>Faça uma pausa longa.</strong>",
         "./imagens/descanso-longo.png",
-        15
+        900
       );
       break;
     case "default":
@@ -64,17 +67,31 @@ function changeTimerButton(element, src, text) {
 
 //Função para controlar o comportamento do timer
 function countDown() {
-  if (minutes <= 0) {
+  if (timeInSeconds <= 0) {
+    audioAlerta.play();
+    stop();
     return;
   }
-  start();
-  minutes -= 1;
-  console.log(minutes);
+  timeInSeconds -= 1;
+  showTime();
 }
 
 //Função que ativa o timer
 function start() {
-  intervalId = setTimeout(countDown, 1000);
+  intervalId = setInterval(countDown, 1000);
+}
+
+//Função para parar o contador
+function stop() {
+  clearInterval(intervalId);
+  intervalId = null;
+}
+
+//função para mostrar tempo na tela
+function showTime(){
+  const timer = new Date(timeInSeconds * 1000);
+  const timeFormated = timer.toLocaleTimeString('pt-Br', {minute: '2-digit', second: '2-digit'});
+  timerScreen.innerHTML = `${timeFormated}`;
 }
 
 //Handler de cliques
@@ -95,21 +112,14 @@ function clickHandlerMusic(e) {
 
 function clickHandlerTimer(e) {
   if (!isClicked) {
-    changeTimerButton(
-      e.currentTarget.children,
-      "./imagens/pause.png",
-      "Pausar"
-    );
-    audioStop.play();
+    changeTimerButton(e.currentTarget.children, "./imagens/pause.png", "Pausar");
+    audioPlay.play();
     start();
     isClicked = 1;
   } else {
-    changeTimerButton(
-      e.currentTarget.children,
-      "./imagens/play_arrow.png",
-      "Começar"
-    );
-    audioPlay.play();
+    changeTimerButton(e.currentTarget.children, "./imagens/play_arrow.png", "Começar");
+    audioStop.play();
+    stop();
     isClicked = 0;
   }
 }
@@ -119,10 +129,8 @@ document.querySelectorAll(".app__card-button").forEach((button) => {
   button.addEventListener("click", clickHandlerContext);
 });
 
-document
-  .getElementById("alternar-musica")
-  .addEventListener("click", clickHandlerMusic);
+document.getElementById("alternar-musica").addEventListener("click", clickHandlerMusic);
 
-document
-  .getElementById("start-pause")
-  .addEventListener("click", clickHandlerTimer);
+document.getElementById("start-pause").addEventListener("click", clickHandlerTimer);
+
+showTime();
