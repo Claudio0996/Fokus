@@ -3,9 +3,13 @@ const btnCnclTask = document.querySelector(".app__form-footer__button--cancel");
 const form = document.querySelector(".app__form-add-task");
 const inputTask = document.querySelector(".app__form-textarea");
 const taskList = document.querySelector(".app__section-task-list");
+const taskOnGoing = document.querySelector(".app__section-active-task-description");
 
 //Retorna o JSON do localStorage e transforma de JSON para objeto que está armazenado
 const tasks = JSON.parse(localStorage.getItem('tarefas')) || [];
+
+let selectedTask = null;
+let selectedTaskLi = null;
 
 //Função para atualizar tarefas
 function updateTasks (){
@@ -59,6 +63,26 @@ function createTask(task){
     li.append(paragraph);
     li.append(btn);
 
+
+    li.onclick = () =>{
+
+        document.querySelectorAll(".app__section-task-list-item-active")
+                .forEach(item => item.classList.remove("app__section-task-list-item-active"));
+
+        if(selectedTask == task){
+            taskOnGoing.textContent = "";
+            selectedTask = null;
+            selectedTaskLi = null;
+            return
+        }
+
+
+        selectedTask = task;
+        selectedTaskLi = li;
+        taskOnGoing.textContent = task.descricao;
+        li.classList.add("app__section-task-list-item-active");
+    }
+
     return li;
 
 }
@@ -87,5 +111,13 @@ form.addEventListener("submit", (e)=>{
     taskList.append(createTask(task));
     resetState();
     updateTasks();
+});
+
+document.addEventListener("FocoFinalizado", () =>{
+    if(selectedTask && selectedTaskLi){
+        selectedTaskLi.classList.remove("app__section-task-list-item-active");
+        selectedTaskLi.classList.add("app__section-task-list-item-complete");
+        selectedTaskLi.querySelector("button").setAttribute('disabled', 'disabled');
+    }
 })
 

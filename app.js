@@ -69,6 +69,11 @@ function changeTimerButton(element, src, text) {
 function countDown() {
   if (timeInSeconds <= 0) {
     audioAlerta.play();
+    const activeFocus = html.getAttribute("data-contexto") == "foco";
+    if(activeFocus){
+      const evento = new CustomEvent("FocoFinalizado");
+      document.dispatchEvent(evento);
+    }
     stop();
     return;
   }
